@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Form</title>
+</head>
+
+<body>
+    <form id="salesForm">
+        <label>
+            Peça de roupa:
+            <input type="text" id="tipoPeca" />
+        </label>
+        <br />
+        <label>
+            Quantidade:
+            <input type="number" id="quant" />
+        </label>
+        <br />
+        <label>
+            Preço:
+            <input type="number" id="preco" />
+        </label>
+        <br />
+        <button type="button" onclick="submitForm()">Submit</button>
+    </form>
+
+    <div id="salesData"></div>
+
+    <script>
+        async function submitForm() {
+            const tipoPeca = document.getElementById('tipoPeca').value;
+            const quant = parseInt(document.getElementById('quant').value);
+            const preco = parseFloat(document.getElementById('preco').value);
+
+            try {
+                // Envia a nova venda para o backend
+                const response = await fetch('http://localhost:3001/api/sales', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ productName, quantity, price }),
+                });
+
+                const data = await response.json();
+                console.log('Dados enviados com sucesso', data);
+
+                // Atualiza a lista de vendas no frontend
+                updateSalesData();
+            } catch (error) {
+                console.error('Erro ao enviar dados', error);
+            }
+        }
+
+        async function updateSalesData() {
+            try {
+                // Obtém todas as vendas do backend
+                const response = await fetch('http://localhost:3001/api/sales');
+                const dadosVend = await response.json();
+
+                // Atualiza a exibição das vendas no frontend
+                const dadosVendasDiv = document.getElementById('dadosVenda');
+                dadosVendasDiv.innerHTML = '<h2>Dados de vendas:</h2>';
+
+                dadosVend.forEach(sale => {
+                    dadosVendasDiv.innerHTML += `
+            <p>Produto: ${sale.productName}, Quantidade: ${sale.quantity}, Preço: ${sale.price}</p>
+          `;
+                });
+            } catch (error) {
+                console.error('Erro ao buscar dados de vendas', error);
+            }
+        }
+
+        // Chama a função de atualização inicialmente para exibir as vendas existentes
+        updateSalesData();
+    </script>
+</body>
+
+</html>
